@@ -56,10 +56,9 @@ public:
     HttpSession& operator=(const HttpSession&) = delete;
 
     void onMessage(const TcpConnectionPtr& connptr, Buffer* buff);
-    void enableGzip(bool on)
+    void setEnableGzip(bool on)
     {
-        if(on)
-            enableGzip_ = true;
+        enableGzip_ = on;
     }
 
 private: 

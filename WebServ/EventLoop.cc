@@ -45,12 +45,22 @@ EventLoop::EventLoop()
     :EpollPtr_(new Epoller()),
     looping_(false),
     wakeUpFd_(createFd()),
-    wakeupChannel(new Channel(this, wakeUpFd_)),
-    mutex_()
+    wakeupChannel_(new Channel(this, wakeUpFd_)),
+    mutex_(),
+    timerQueuePtr_(new TimerQueue(this))
 {
     threadid_ = getThreadId();
-    wakeupChannel->enableRead();
+    wakeupChannel_->enableRead();
     LOG_LOG << "EventLoop::EventLoop created int thread " << threadid_;
+}
+
+EventLoop::~EventLoop()
+{
+    wakeupChannel_->disableAll();
+    wakeupChannel_->remove();
+    ::close(wakeUpFd_);
+    EpollPtr_.reset();
+    timerQueuePtr_.reset();
 }
 
 void EventLoop::loop()
@@ -154,5 +164,15 @@ void EventLoop::handleRead()
   {
     LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
   }
+}
+
+void EventLoop::runAt(int sec, TimerCallback cb)
+{
+    timerQueuePtr_->addTimer(sec, std::move(cb), false);
+}
+
+void EventLoop::runEveryN(int sec, TimerCallback cb)
+{
+    timerQueuePtr_->addTimer(sec, std::move(cb), true);
 }
 

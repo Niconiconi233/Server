@@ -129,8 +129,10 @@ void HttpSession::doResponce()
             gzip += ".gz";
             if(!sendPage(gzip, mime, true))//当前没有.gz文件案
             {
-                makeGzip(uri);//可能会出错
-                sendPage(gzip, mime, true);
+                if(makeGzip(uri))//可能会出错
+                    sendPage(gzip, mime, true);
+                else 
+                    sendError(REQUEST_BAD);
             }
         }//不压缩的文件
         else
@@ -188,6 +190,7 @@ std::string HttpSession::headerConstructor(RequestState st, const std::string mi
 
 bool HttpSession::parseHeader(std::string& header)
 {
+    requests_.clear();
     std::vector<std::string> lists = splice(header, "\r\n");//分行
     std::vector<std::string> line = splice(lists[0], " ");//分解GET / HTTP/1.1
     if(strcmp(line[0].c_str(), "GET") == 0)
@@ -222,7 +225,7 @@ bool HttpSession::parseHeader(std::string& header)
         headState_ = HEADER_BAD;
         return false;
     }
-    if(line[1].length() == 1)//如果是直接访问ip和端口
+    if(line[1] == "/")//如果是直接访问ip和端口
     {
         requests_["URI"] = "/index.html";
     }
@@ -290,6 +293,7 @@ bool HttpSession::sendPage(std::string& pagename, std::string& mime, bool gzip)
         }
         else
         {
+            LOG_LOG << "HttpSession::sendPage file can't be read";
             sendError(REQUEST_FORBIDDEN);
         } 
         return true; 

@@ -22,10 +22,7 @@ public:
     HttpServer& operator=(const HttpServer&) = delete;
 
     void init();
-    void enableGzip(bool on)
-    {
-        enableGzip_ = on;
-    }
+    void enableGzip(bool on);
 
     void onConnect(const TcpConnectionPtr&);
    // void onMessage(TcpConnectionPtr&, Buffer*);
@@ -36,7 +33,7 @@ private:
     std::atomic_int sessionId_;
     std::string ip_;
     std::string port_;
-    bool enableGzip_;
+    bool Gzip_;
     int threadNumber_;
     std::map<int, std::shared_ptr<HttpSession>> sessionLists_;
 };

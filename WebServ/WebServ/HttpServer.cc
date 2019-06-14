@@ -14,7 +14,7 @@ HttpServer::HttpServer(const std::string ip, const std::string port, EventLoop* 
     sessionId_(0),
     ip_(ip),
     port_(port),
-    enableGzip_(false),
+    Gzip_(false),
     threadNumber_(threadNumber)
 {
 
@@ -39,11 +39,18 @@ void HttpServer::init()
 void HttpServer::onConnect(const TcpConnectionPtr& ptr)
 {
     std::shared_ptr<HttpSession> session(new HttpSession(ptr, sessionId_.load()));
-    if(enableGzip_)
-        session->enableGzip(true);
+    if(Gzip_)
+        session->setEnableGzip(true);
     ++sessionId_;
     //lock
     sessionLists_[ptr->getFd()] = session;
     ptr->setMessageCallback(std::bind(&HttpSession::onMessage, session.get(), std::placeholders::_1, std::placeholders::_2));
     LOG_LOG << "new connection from " << ptr->peerAddress().toIpPort();
+}
+
+void HttpServer::enableGzip(bool on)
+{
+    if(on)
+        LOG_LOG << "HttpServer enabled Gzip";
+    Gzip_ = on;
 }

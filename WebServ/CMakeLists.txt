@@ -15,6 +15,8 @@ SET(SRC_LIST
 	TcpServer.cc
 	EventLoopThread.cc
 	EventLoopThreadPool.cc
+	TimerHeap.hpp
+	TimerQueue.cc
 )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
