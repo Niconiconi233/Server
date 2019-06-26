@@ -16,6 +16,10 @@ public:
     typedef std::function<void ()> ThreadFunc;
     explicit Thread(const ThreadFunc& func, const std::string& name = std::string());
     ~Thread();
+
+    Thread(const Thread&) = delete;
+    Thread& operator=(const Thread&) = delete;
+
     void start();
     void join();
     bool started(){return this->started_;}

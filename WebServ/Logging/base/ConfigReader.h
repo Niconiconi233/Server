@@ -14,6 +14,9 @@ public:
     ConfigReader(const std::string FileName);
     ~ConfigReader();
 
+    ConfigReader(const ConfigReader&) = delete;
+    ConfigReader& operator=(const ConfigReader&) = delete;
+
     int getAsInt(const std::string key);
     double getAsDouble(const std::string key);
     std::string getAsString(const std::string key);

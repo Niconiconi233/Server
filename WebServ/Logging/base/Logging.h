@@ -19,6 +19,10 @@ class Logger{
 public:
     Logger(const LogLevel& level,const char* filename, int line);
     ~Logger();
+
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+
     LogStream& stream(){return impl.stream_;}
 
     static void setLogFileName(std::string& filename)

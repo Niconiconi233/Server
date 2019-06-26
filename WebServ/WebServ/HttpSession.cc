@@ -114,7 +114,7 @@ void HttpSession::doResponce()
     assert(headState_ == HEADER_OK);
     std::string uri("html");
     uri += requests_["URI"];
-    size_t pos = uri.find(".");
+    size_t pos = uri.find_last_of(".");
     if(pos == std::string::npos)
     {
         sendError(REQUEST_BAD);
@@ -193,6 +193,7 @@ bool HttpSession::parseHeader(std::string& header)
     requests_.clear();
     std::vector<std::string> lists = splice(header, "\r\n");//分行
     std::vector<std::string> line = splice(lists[0], " ");//分解GET / HTTP/1.1
+    //todo 解析问号后的请求
     if(strcmp(line[0].c_str(), "GET") == 0)
     {
         method_ = HTTP_GET;

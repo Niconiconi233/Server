@@ -15,6 +15,7 @@ public:
     LogFile(const std::string& name, int everyn = 1024);
     ~LogFile();
 
+
     void append(const char* line, size_t len);
     void flush();
 
