@@ -7,10 +7,15 @@
 #include <iostream>
 
 AsyncLogging::AsyncLogging(const std::string& basename, int flushInterval )
-: flushInterval_(flushInterval), running_(false), basename_(basename),
-thread_(std::bind(&AsyncLogging::threadFunc, this), "Loggin"),
-mutex_(),cond_(mutex_), currentBuffer_(new Buffer_), nextBuffer_(new Buffer_),
-buffers_(),latch_(1)
+    : flushInterval_(flushInterval), 
+    running_(false), 
+    basename_(basename),
+    thread_(std::bind(&AsyncLogging::threadFunc, this), "Loggin"),
+    mutex_(),
+    cond_(mutex_),
+    currentBuffer_(new Buffer_),
+    nextBuffer_(new Buffer_),
+    buffers_(),latch_(1)
 {
     assert(basename.size() > 0);
     currentBuffer_->bzero();
@@ -19,9 +24,10 @@ buffers_(),latch_(1)
 }
 
 //生产者
-void AsyncLogging::append(const char* logline, int len){
+void AsyncLogging::append(const char* logline, int len)
+{
     MutexLockGurard lock(mutex_);
-    if(currentBuffer_->avail() > len)
+    if(currentBuffer_->avail() > static_cast<size_t>(len))
         currentBuffer_->append(logline, len);
     else
     {

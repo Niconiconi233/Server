@@ -1,15 +1,4 @@
-// Copyright 2010, Shuo Chen.  All rights reserved.
-// http://code.google.com/p/muduo/
-//
-// Use of this source code is governed by a BSD-style license
-// that can be found in the License file.
-
-// Author: Shuo Chen (chenshuo at chenshuo dot com)
-//
-
 #include "Buffer.h"
-
-//#include "muduo/net/SocketsOps.h"
 
 #include <errno.h>
 #include <sys/uio.h>
@@ -46,10 +35,6 @@ ssize_t Buffer::readFd(int fd, int* savedErrno)
     writerIndex_ = buffer_.size();//不会扩容
     append(extrabuf, n - writable);
   }
-  // if (n == writable + sizeof extrabuf)
-  // {
-  //   goto line_30;
-  // }
   return n;
 }
 

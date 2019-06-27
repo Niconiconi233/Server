@@ -37,6 +37,7 @@ private:
     ChannelPtr wakeupChannel_;
     MutexLock mutex_;
     std::unique_ptr<TimerQueue> timerQueuePtr_;
+    const int threadId_;
     
     void wakeup();
     void doPendingFunc();

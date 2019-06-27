@@ -6,6 +6,7 @@
 #include <atomic>
 
 #include "../TcpConnection.h"
+#include "../Logging/base/MutexLock.h"
 
 class HttpSession;
 class EventLoop;
@@ -36,6 +37,7 @@ private:
     bool Gzip_;
     int threadNumber_;
     std::map<int, std::shared_ptr<HttpSession>> sessionLists_;
+    MutexLock mutex_;
 };
 
 #endif // !FILESERV_HTTPSERVER_H

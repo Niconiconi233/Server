@@ -4,11 +4,17 @@
 
 #include <sys/epoll.h>
 #include <cassert>
+#include <errno.h>
 
 
 Epoller::Epoller():eventlists_(initSize)
 {
     epollid_ = epoll_create1(EPOLL_CLOEXEC);
+    if(epollid_ <= 0)
+    {
+        char buf[32] = {0};
+        LOG_FATAL << "Epoller create epollid failed " << strerror_r(errno, buf, 32);
+    }
 }
 
 void Epoller::modEvent(const ChannelPtr& channel)
@@ -21,13 +27,13 @@ void Epoller::modEvent(const ChannelPtr& channel)
          struct epoll_event event;
         event.data.fd = fd;
         event.events = channel->getEvents();
-        itemlists_[fd] = channel;//3
+        itemlists_[fd] = channel;
         if(epoll_ctl(epollid_, EPOLL_CTL_ADD, fd, &event) < 0)
         {
             LOG_ERROR << "Epoller::addevent failed in channel sockfd = " << fd << " " << strerror(errno);
             return;
         }
-        LOG_LOG << "Epoller::addEvent fd = " << fd <<  " event is " << event.events;
+        LOG_TRACE << "Epoller::addEvent fd = " << fd <<  " event is " << event.events;
     }
     else{
         struct epoll_event event;
@@ -37,7 +43,7 @@ void Epoller::modEvent(const ChannelPtr& channel)
         {
             LOG_ERROR << "Epoller::modevent failed in channel " << channel.get() << " event is " << event.events;
         }
-        LOG_LOG << "Epoller::modevent fd = " << fd << " new event is " << event.events;
+        LOG_TRACE << "Epoller::modevent fd = " << fd << " new event is " << event.events;
     }
 }
 
@@ -55,7 +61,7 @@ void Epoller::delEvent(const ChannelPtr& channel)
         LOG_ERROR << "Epoller::delevent failed in channel " << channel.get() << " event is " << event.events;
     }
     itemlists_.erase(fd);//智能指针-1
-    LOG_LOG << "Epoller::delevent fd = " << channel->getFd();
+    LOG_TRACE << "Epoller::delevent fd = " << channel->getFd();
 
 }
 
@@ -64,7 +70,7 @@ std::vector<ChannelPtr> Epoller::poll()
     int n = epoll_wait(epollid_, eventlists_.data(), eventlists_.size(), EPOLLWAIT_TIME);
     if(n < 0)
     {
-            LOG_ERROR << "Epoller::poll failed ";
+            LOG_ERROR << "Epoller::poll failed";
     }
     return fileVector(eventlists_, n);
 }

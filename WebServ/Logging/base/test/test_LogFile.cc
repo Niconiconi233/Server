@@ -11,7 +11,11 @@ void threadFunc()
 {
     for (int i = 0; i < 100000; ++i)
     {
-        LOG_LOG << i;
+	LOG_ERROR << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_LOG << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_DEBUG << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_WARN << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_FATAL << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
     }
 }
 
@@ -66,22 +70,29 @@ void other()
     // 1 line
     cout << "----------other test-----------" << endl;
     LOG_ERROR << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_LOG << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_DEBUG << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_WARN << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
+	LOG_FATAL << "fddsa" << 'c' << 0 << 3.666 << string("This is a string");
 }
 
 
 int main()
 {
     // 共500014行
-    /*type_test();
+	    Logger::setLevel(INFO);
+    type_test();
     sleep(3);
 
     stressing_single_thread();
     sleep(3);
 
     other();
-    sleep(3);*/
+    sleep(3);
+
 
     stressing_multi_threads();
-    sleep(3);
+
+    sleep(5);
     return 0;
 }

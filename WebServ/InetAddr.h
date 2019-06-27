@@ -21,8 +21,6 @@ public:
     const std::string& toIp() const;
     const std::string& toPort() const;
 
-
-
 private: 
     struct sockaddr_in address_;
     std::string addr_, port_;

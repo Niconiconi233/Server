@@ -47,56 +47,66 @@ template class FixdBuffer<KLargeBuffer>;
 template class FixdBuffer<KSmallBuffer>;
 
 template<typename T>
-void LogStream::formatInteger(T value){
+void LogStream::formatInteger(T value)
+{
     if(_buf.avail() > KMaxNumberSize){
         int len = convert(_buf.current(), value);
         _buf.add(len);
     }
 }
 
-LogStream& LogStream::operator<<(unsigned short v){
+LogStream& LogStream::operator<<(unsigned short v)
+{
     int val = static_cast<unsigned int>(v);
     this->formatInteger(val);
     return *this;
 }
 
-LogStream& LogStream::operator<<(short v){
+LogStream& LogStream::operator<<(short v)
+{
     int val = static_cast<int>(v);
     this->formatInteger(val);
     return *this;
 }
 
-LogStream& LogStream::operator<<(int v){
+LogStream& LogStream::operator<<(int v)
+{
     this->formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned int v){
+LogStream& LogStream::operator<<(unsigned int v)
+{
     this->formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(long v){
+LogStream& LogStream::operator<<(long v)
+{
     this->formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned long v){
+LogStream& LogStream::operator<<(unsigned long v)
+{
     this->formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(unsigned long long v){
+LogStream& LogStream::operator<<(unsigned long long v)
+{
     this->formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(long long v){
+LogStream& LogStream::operator<<(long long v)
+{
     this->formatInteger(v);
     return *this;
 }
 
-LogStream& LogStream::operator<<(double v){
+LogStream& LogStream::operator<<(double v)
+{
     if(_buf.avail() > KMaxNumberSize){
         int len = snprintf(_buf.current(), KMaxNumberSize, "%.12g", v);
         _buf.add(len);
@@ -104,7 +114,8 @@ LogStream& LogStream::operator<<(double v){
     return *this;
 }
 
-LogStream& LogStream::operator<<(long double v){
+LogStream& LogStream::operator<<(long double v)
+{
     if(_buf.avail() > KMaxNumberSize){
         int len = snprintf(_buf.current(), KMaxNumberSize, "%.12Lg", v);
         _buf.add(len);
@@ -114,7 +125,6 @@ LogStream& LogStream::operator<<(long double v){
 
 LogStream& LogStream::operator<<(const void* p)
 {
-    //uintptr_t v = reinterpret_cast<uintptr_t>(p);
     uintptr_t v = (uintptr_t)(p);
     if(_buf.avail() >= KMaxNumberSize)
     {

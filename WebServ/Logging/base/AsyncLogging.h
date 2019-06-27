@@ -11,7 +11,8 @@
 #include <string>
 #include <vector>
 
-class AsyncLogging : noncopyable{
+class AsyncLogging : noncopyable
+{
 public:
     AsyncLogging(const std::string& basename, int flushInterval = 3);
     ~AsyncLogging()

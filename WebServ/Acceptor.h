@@ -23,7 +23,6 @@ public:
 
     void listen();
 
-
 private: 
     EventLoop* loop_;
     Socket acceptSocket_;

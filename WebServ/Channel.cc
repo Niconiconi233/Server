@@ -7,7 +7,7 @@
 
 Channel::~Channel()
 {
-    LOG_LOG << "~Channel fd = " << fd_;
+    LOG_TRACE << "~Channel fd = " << fd_;
 }
 
 void Channel::handleEvents()
@@ -33,7 +33,7 @@ void Channel::handleEvents()
 
 void Channel::updateChannel()
 {
-    loop_->updateChannel(shared_from_this());//2
+    loop_->updateChannel(shared_from_this());
 }
 
 void Channel::remove()

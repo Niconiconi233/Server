@@ -11,7 +11,8 @@
 #include <functional>
 #include <string>
 
-class Thread{
+class Thread
+{
 public:
     typedef std::function<void ()> ThreadFunc;
     explicit Thread(const ThreadFunc& func, const std::string& name = std::string());

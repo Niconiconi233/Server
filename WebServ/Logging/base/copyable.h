@@ -1,7 +1,8 @@
 #ifndef _COPYABLE_H
 #define _COPYABLE_H
 
-class copyable{
+class copyable
+{
 
 protected:
     copyable() = default;

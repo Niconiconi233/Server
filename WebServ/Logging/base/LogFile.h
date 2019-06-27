@@ -10,11 +10,11 @@
 #include <memory>
 #include <string>
 
-class LogFile : noncopyable{
+class LogFile : noncopyable
+{
 public:
     LogFile(const std::string& name, int everyn = 1024);
     ~LogFile();
-
 
     void append(const char* line, size_t len);
     void flush();
@@ -28,6 +28,7 @@ private:
 
 private:
     void _append(const char* line, size_t len);
+
 };
 
 

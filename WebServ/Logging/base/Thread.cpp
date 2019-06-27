@@ -8,7 +8,8 @@
 #include "CurrentThread.h"
 
 //每个线程一个
-namespace CurrentThread{
+namespace CurrentThread
+{
     __thread int t_cachedTid = 0;
     __thread char t_tidString[32];
     __thread int t_tidStringLength = 6;
@@ -16,18 +17,21 @@ namespace CurrentThread{
 }
 
 //pthread_self获取的是线程id, 要获取线程pid要调用syscall
-pid_t gettid(){
+pid_t gettid()
+{
     return static_cast<pid_t>(::syscall(SYS_gettid));
 }
 
-void CurrentThread::cacheTid(){
+void CurrentThread::cacheTid()
+{
     if(t_cachedTid == 0){
         t_cachedTid = gettid();
         snprintf(t_tidString, sizeof t_tidString, "%5d", t_cachedTid);
     }
 }
 //对线程的包装，获取了线程的相关信息，实际调用的是这个的runinthread
-struct ThreadData{
+struct ThreadData
+{
     typedef Thread::ThreadFunc ThreadFunc;
     ThreadFunc func;
     std::string name_;
@@ -35,9 +39,16 @@ struct ThreadData{
     CountDownLatch* latch_;
 
     ThreadData(const ThreadFunc& fun, const std::string& name, pid_t* tid, CountDownLatch* latch)
-    :func(fun), name_(name), tid_(tid), latch_(latch){}
+        :func(fun), 
+        name_(name), 
+        tid_(tid), 
+        latch_(latch)
+{
 
-    void runInThread(){
+}
+
+    void runInThread()
+    {
         *tid_ = CurrentThread::tid();
         tid_ = nullptr;
         latch_->countdown();//notify
@@ -50,24 +61,34 @@ struct ThreadData{
     } 
 };
 
-void* startThread(void* arg){
+void* startThread(void* arg)
+{
     ThreadData* data = static_cast<ThreadData*>(arg);
     data->runInThread();
     return NULL;
 }
 
-Thread::Thread(const ThreadFunc& func, const std::string& n): joined_(false), started_(false), pthread_id(0), tid_(0), func_(func), name_(n), latch_(1)
+Thread::Thread(const ThreadFunc& func, const std::string& n)
+    : joined_(false), 
+    started_(false), 
+    pthread_id(0), 
+    tid_(0), 
+    func_(func), 
+    name_(n), 
+    latch_(1)
 {
     setDefaultName();
 }
 
-Thread::~Thread(){
+Thread::~Thread()
+{
     if(started_ && !joined_){
         pthread_detach(pthread_id);
     }
 }
 
-void Thread::setDefaultName(){
+void Thread::setDefaultName()
+{
     if(name_.empty()){
         char buf[32];
         snprintf(buf, sizeof buf, "%s", "Thread");
@@ -75,7 +96,8 @@ void Thread::setDefaultName(){
     }
 }
 
-void Thread::start(){
+void Thread::start()
+{
     assert(!this->started_);
     started_ = true;
     ThreadData* data = new ThreadData(func_, name_, &tid_, &latch_);
@@ -88,10 +110,10 @@ void Thread::start(){
     }
 }
 
-void Thread::join(){
+void Thread::join()
+{
     assert(started_);
     assert(!joined_);
     joined_ = true;
     pthread_join(pthread_id, NULL);
-
 }

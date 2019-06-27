@@ -121,6 +121,7 @@ void HttpSession::doResponce()
         return;
     }
     std::string mime(uri, pos , uri.length() - pos);
+    //LOG_DEBUG << uri << "------" << mime;
     if(enableGzip_)
     {
         if(strcmp(mime.c_str() , ".html") == 0 || strcmp(mime.c_str(), ".css") == 0 || strcmp(mime.c_str(), ".js") == 0)
@@ -294,7 +295,7 @@ bool HttpSession::sendPage(std::string& pagename, std::string& mime, bool gzip)
         }
         else
         {
-            LOG_LOG << "HttpSession::sendPage file can't be read";
+            LOG_ERROR << "HttpSession::sendPage file can't be read";
             sendError(REQUEST_FORBIDDEN);
         } 
         return true; 

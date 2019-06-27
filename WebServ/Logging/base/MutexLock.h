@@ -98,42 +98,59 @@ __END_DECLS
 
 #endif // CHECK_PTHREAD_RETURN_VALUE
 
-class MutexLock : noncopyable{
+class MutexLock : noncopyable
+{
     friend class Condition;
 public:
-    MutexLock(){
+    MutexLock()
+    {
         pthread_mutexattr_init(&attr_);
         pthread_mutexattr_settype(&attr_, PTHREAD_MUTEX_ERRORCHECK);
         pthread_mutex_init(&mutex, &attr_);
     }
-    ~MutexLock(){
+
+    ~MutexLock()
+    {
         pthread_mutex_unlock(&mutex);
         pthread_mutexattr_destroy(&attr_);
         pthread_mutex_destroy(&mutex);
     }
-    void lock(){
+
+    void lock()
+    {
         pthread_mutex_lock(&mutex);
     }
-    void unlock(){
+
+    void unlock()
+    {
         pthread_mutex_unlock(&mutex);
     }
-    void trylock(){
+
+    void trylock()
+    {
         pthread_mutex_trylock(&mutex);
     }
-    pthread_mutex_t* get(){
+
+    pthread_mutex_t* get()
+    {
         return &mutex;
     }
+
 private:
     pthread_mutex_t mutex;
     pthread_mutexattr_t attr_;
 };
 
-class MutexLockGurard{
+class MutexLockGurard
+{
 public:
-    explicit MutexLockGurard(MutexLock& mutex):mutex(mutex){
+    explicit MutexLockGurard(MutexLock& mutex):mutex(mutex)
+    {
         mutex.lock();
     }
-    ~MutexLockGurard(){
+    
+    ~MutexLockGurard()
+    {
         mutex.unlock();
     }
 

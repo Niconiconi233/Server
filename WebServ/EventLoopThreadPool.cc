@@ -21,7 +21,7 @@ void EventLoopThreadPool::start()
 {
     baseLoop_->assertInLoopThread();
     started_ = true;
-    LOG_LOG << "EventLoopThreadPool " << numThread_;
+    LOG_DEBUG << "EventLoopThreadPool thread number is " << numThread_;
     for(int i = 0; i < numThread_; ++i)
     {
         EventLoopThread* thread = new EventLoopThread();

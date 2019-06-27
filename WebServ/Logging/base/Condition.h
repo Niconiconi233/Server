@@ -10,22 +10,37 @@
 #include "MutexLock.h"
 #include "noncopyable.h"
 
-class Condition : noncopyable{
+class Condition : noncopyable
+{
 public:
-    Condition(MutexLock& _mutex):mutex(_mutex){pthread_cond_init(&mutex_cond, NULL);}
-    ~Condition(){
+    Condition(MutexLock& _mutex)
+    : mutex(_mutex)
+    {
+        pthread_cond_init(&mutex_cond, NULL);
+    }
+
+    ~Condition()
+    {
         pthread_cond_destroy(&mutex_cond);
     }
-    void wait(){
+
+    void wait()
+    {
         pthread_cond_wait(&mutex_cond, mutex.get());
     }
-    void notify(){
+
+    void notify()
+    {
         pthread_cond_signal(&mutex_cond);
     }
-    void notifyall(){
+
+    void notifyall()
+    {
         pthread_cond_broadcast(&mutex_cond);
     }
-    bool timedwait(int sec){
+
+    bool timedwait(int sec)
+    {
         struct timespec tp;
         clock_getres(CLOCK_REALTIME, &tp);
         tp.tv_sec += static_cast<time_t>(sec);

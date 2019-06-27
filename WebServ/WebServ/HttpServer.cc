@@ -15,7 +15,8 @@ HttpServer::HttpServer(const std::string ip, const std::string port, EventLoop* 
     ip_(ip),
     port_(port),
     Gzip_(false),
-    threadNumber_(threadNumber)
+    threadNumber_(threadNumber),
+    mutex_()
 {
 
 }
@@ -38,14 +39,28 @@ void HttpServer::init()
 
 void HttpServer::onConnect(const TcpConnectionPtr& ptr)
 {
-    std::shared_ptr<HttpSession> session(new HttpSession(ptr, sessionId_.load()));
-    if(Gzip_)
-        session->setEnableGzip(true);
-    ++sessionId_;
-    //lock
-    sessionLists_[ptr->getFd()] = session;
-    ptr->setMessageCallback(std::bind(&HttpSession::onMessage, session.get(), std::placeholders::_1, std::placeholders::_2));
-    LOG_LOG << "new connection from " << ptr->peerAddress().toIpPort();
+    if(ptr->connected()){
+        std::shared_ptr<HttpSession> session(new HttpSession(ptr, sessionId_.load()));
+        if(Gzip_)
+            session->setEnableGzip(true);
+        ++sessionId_;
+        {
+            MutexLockGurard lock(mutex_);
+            sessionLists_[ptr->getFd()] = session;
+        }
+        ptr->setMessageCallback(std::bind(&HttpSession::onMessage, session.get(), std::placeholders::_1, std::placeholders::_2));
+        LOG_DEBUG << "new connection from " << ptr->peerAddress().toIpPort();
+    }
+    else
+    {
+        {
+            MutexLockGurard lock(mutex_);
+            size_t ret = sessionLists_.erase(ptr->getFd());
+            assert(ret == 1);
+            LOG_DEBUG << "HttpServer::onconnection connection closed";
+        }
+    }
+    
 }
 
 void HttpServer::enableGzip(bool on)

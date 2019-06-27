@@ -12,7 +12,8 @@ const int KSmallBuffer = 4000;
 const int KLargeBuffer = 4000 * 1000;
 
 template<int SIZE>
-class FixdBuffer : noncopyable{
+class FixdBuffer : noncopyable
+{
 public:
     FixdBuffer():cur(data){}
     ~FixdBuffer(){}
@@ -34,20 +35,25 @@ public:
         memset(data, 0, sizeof data);
         cur = data;
     }
+
     void reset(){
         cur = data;
     }
+
 private:
     char data[SIZE];
     char *cur;
+
 private:
-       const char* end() {
-       char* p = data;
-       return p + SIZE;
+       const char* end()
+       {
+        char* p = data;
+        return p + SIZE;
        }
 };
 
-class LogStream : noncopyable{
+class LogStream : noncopyable
+{
     typedef LogStream self;
 public:
     typedef FixdBuffer<KSmallBuffer> buffer;
@@ -59,18 +65,24 @@ public:
     self& operator<<(long);
     self& operator<<(unsigned long long);
     self& operator<<(long long);
-    self& operator<<(float v){
-        *this<<static_cast<double>(v);
-        return *this;
-    }
     self& operator<<(const void*);
     self& operator<<(double);
     self& operator<<(long double);
-    self& operator<<(char c){
+
+    self& operator<<(float v)
+    {
+        *this<<static_cast<double>(v);
+        return *this;
+    }
+
+    self& operator<<(char c)
+    {
         _buf.append(&c, 1);
         return *this;
     }
-    self& operator<<(const char* str){
+
+    self& operator<<(const char* str)
+    {
         if(str){
             _buf.append(str, strlen(str));
         }else{
@@ -79,25 +91,33 @@ public:
         return *this;
     }
 
-    self& operator<<(const unsigned char* str){
+    self& operator<<(const unsigned char* str)
+    {
         *this<<reinterpret_cast<const char*>(str);
         return *this;
     }
     
-    self& operator<<(const std::string& str){
+    self& operator<<(const std::string& str)
+    {
         _buf.append(str.c_str(), str.size());
         return *this;
     }
 
-    void append(const char* str, size_t len){
+    void append(const char* str, size_t len)
+    {
         _buf.append(str, len);
     }
-    const buffer& get_buf(){
+
+    const buffer& get_buf()
+    {
         return _buf;
     }
-    void reset(){
+
+    void reset()
+    {
         _buf.reset();
     }
+    
 private:
     buffer _buf;
     static const int KMaxNumberSize = 32;

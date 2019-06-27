@@ -1,6 +1,12 @@
 #include "CountDownLatch.h"
 
-CountDownLatch::CountDownLatch(int cnt):_mutex(), _cond(_mutex), count(cnt){}
+CountDownLatch::CountDownLatch(int cnt)
+    : _mutex(),
+    _cond(_mutex),
+    count(cnt)
+{
+    
+}
 
 void CountDownLatch::wait()
 {

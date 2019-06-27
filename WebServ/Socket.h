@@ -12,6 +12,7 @@ public:
     Socket(int fd):sockfd_(fd),state_(kdislistened){}
     Socket():sockfd_(0),state_(kdislistened){}
     ~Socket();
+
     void createSocket();
     void bind(const std::string address, const std::string port);
     void bind(const InetAddr& addr);

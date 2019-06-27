@@ -6,7 +6,7 @@
 #include "EventLoop.h"
 
 EventLoopThread::EventLoopThread()
-    :thread_(std::bind(&EventLoopThread::threadFunc, this)),
+    :thread_(std::bind(&EventLoopThread::threadFunc, this), "Polling"),
     loop_(nullptr),
     mutex_(),
     cond_(mutex_)

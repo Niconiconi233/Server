@@ -5,13 +5,10 @@
 #include "Socket.h"
 #include "EventLoop.h"
 
-//test
-#include <iostream>
-
 TcpConnection::TcpConnection(EventLoop* loop, int fd, const InetAddr& localaddr, const InetAddr& peeraddr)
     :loop_(loop),
     socketPtr_(new Socket(fd)),
-    channelPtr_(new Channel(loop, fd)),//1
+    channelPtr_(new Channel(loop, fd)),
     localAddr_(localaddr),
     peerAddr_(peeraddr),
     state_(kdisconnecting)
@@ -23,7 +20,7 @@ TcpConnection::TcpConnection(EventLoop* loop, int fd, const InetAddr& localaddr,
     channelPtr_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
     socketPtr_->setTcpKeepalive(true);
     socketPtr_->noTcpDelay(true);
-    LOG_LOG << "TcpConnection created fd = " << fd << " peeraddr = " << peerAddr_.toIpPort() << "in loop " << loop;
+    LOG_TRACE << "TcpConnection created fd = " << fd << " peeraddr = " << peerAddr_.toIpPort() << "in loop " << loop;
 }
 
 TcpConnection::~TcpConnection()
@@ -77,7 +74,7 @@ void TcpConnection::SendInLoop(const void* data, size_t len)
   if (!channelPtr_->isWriting() && outputBuffer_.readableBytes() == 0)
   {
     nwrote = net::Send(channelPtr_->getFd(), data, len);
-    LOG_DEBUG <<"TcpConnection::sendInLoop send " << nwrote << " bytes data to fd " << channelPtr_->getFd();
+    LOG_TRACE <<"TcpConnection::sendInLoop send " << nwrote << " bytes data to fd " << channelPtr_->getFd();
     if (nwrote >= 0)
     {
       remaining = len - nwrote;
@@ -139,9 +136,11 @@ void TcpConnection::connectDestroyed()
       {
           setState(kdisconnected);
           channelPtr_->disableAll();
+
+          connectionCallback_(shared_from_this());//通知作用
       }
       channelPtr_->remove();
-      LOG_LOG << "Tcpconnection::connectDestroyed fd = " << getFd();
+      LOG_TRACE << "Tcpconnection::connectDestroyed fd = " << getFd();
       }
   }
 
@@ -156,8 +155,7 @@ void TcpConnection::handleRead()
     {
         messageCallback_(shared_from_this(), &inputBuffer_);
     }else if(nread == 0)
-        //test now use_count is 2
-        closeCallback_(shared_from_this());//use_count++
+        closeCallback_(shared_from_this());
     else
     {
         LOG_ERROR << "TcpConnection::handleRead";
@@ -167,13 +165,12 @@ void TcpConnection::handleRead()
 
 void TcpConnection::handleClose()
 {
-    LOG_DEBUG << "in handleclose";
     loop_->assertInLoop();
     assert(state_ == kconnected || state_ == kdisconnecting);
     channelPtr_->disableAll();
     TcpConnectionPtr ptr(shared_from_this());//use_count = 2
     closeCallback_(ptr);
-    LOG_LOG << "TcpConnection::handleClose sockfd = " << channelPtr_->getFd();
+    LOG_DEBUG << "TcpConnection::handleClose sockfd = " << channelPtr_->getFd();
 }
 
 void TcpConnection::handleWrite()
@@ -192,7 +189,7 @@ void TcpConnection::handleWrite()
                 shutdownInLoop();
         }else
         {
-            LOG_ERROR << "TcpConnection::handleWrite" << strerror(errno);
+            LOG_ERROR << "TcpConnection::handleWrite " << strerror(errno);
         }
     }else
     {

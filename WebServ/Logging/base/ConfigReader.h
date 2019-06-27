@@ -8,10 +8,11 @@
 #include <string>
 
 
+
 class ConfigReader
 {
 public: 
-    ConfigReader(const std::string FileName);
+    ConfigReader(const std::string FileName = "ServerConfig.conf");
     ~ConfigReader();
 
     ConfigReader(const ConfigReader&) = delete;

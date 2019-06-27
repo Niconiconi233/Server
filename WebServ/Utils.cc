@@ -74,7 +74,7 @@ int net::createSocketOrDie()
 {
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
     net::setNonBlock(sockfd);
-    LOG_LOG << "create sockfd " << sockfd;
+    LOG_TRACE << "create sockfd fd = " << sockfd;
     assert(sockfd > 0);
     return sockfd;
 }
@@ -83,14 +83,14 @@ void net::listenOrDie(int sockfd)
 {
     int ret = ::listen(sockfd, SOMAXCONN);
     assert(ret == 0);
-    LOG_LOG << "start listenin on " << sockfd;
+    LOG_TRACE << "start listenin on " << sockfd;
 }
 
 int net::acceptOrDie(int sockfd, struct sockaddr_in* addr)
 {
    socklen_t len = sizeof addr;
     int listenfd = ::accept4(sockfd, (sockaddr*)addr, &len, SOCK_CLOEXEC | SOCK_NONBLOCK);
-    LOG_LOG << "new connection listenfd = " << listenfd;
+    LOG_DEBUG << "new connection listenfd = " << listenfd;
     assert(listenfd > 0);
     return listenfd;
 }
@@ -129,4 +129,13 @@ size_t net::Recv(int sockfd, void* buffer, size_t len)
 {
   size_t nrecv = ::recv(sockfd, buffer, len, 0);
   return nrecv;
+}
+
+bool net::SelfConnection(int sockfd)
+{
+  struct sockaddr_in localaddr = net::getLocalAddr(sockfd);
+  struct sockaddr_in peeraddr = net::getPeerAddr(sockfd);
+  if(memcmp(&localaddr.sin_addr, &peeraddr.sin_addr, sizeof(localaddr.sin_addr)) == 0 && memcmp(&localaddr.sin_port, &peeraddr.sin_port, sizeof(peeraddr.sin_port)) == 0)
+    return true;
+  return false;
 }

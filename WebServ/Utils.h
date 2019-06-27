@@ -56,6 +56,8 @@ size_t Recv(int sockfd, Buffer& buffer, size_t len);
 
 size_t Recv(int sockfd, void* buffer, size_t len);
 
+bool SelfConnection(int sockfd);
+
 }//namespace net
 
 #endif // !FILESERV_UTILS_H

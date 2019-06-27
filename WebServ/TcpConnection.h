@@ -59,6 +59,9 @@ public:
   void connectEstablished();   // should be called only once
   // called when TcpServer has removed me from its map
   void connectDestroyed();  // should be called only once
+
+  bool connected() const {return state_ == kconnected;}
+
 private: 
     enum state {kconnecting, kconnected, kdisconnecting, kdisconnected}; 
 

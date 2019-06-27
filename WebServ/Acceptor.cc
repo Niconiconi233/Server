@@ -34,7 +34,13 @@ void Acceptor::handleRead()
 {
     struct sockaddr_in addr;
     int connfd = acceptSocket_.accept(&addr);
-    if(connfd > 0){
+    if(connfd > 0)
+    {
+        if(net::SelfConnection(connfd))//判断自连接
+        {
+            net::myclose(connfd);
+            return;
+        }
         InetAddr peerAddr(addr);
         if(newConnCallback_)
         {

@@ -8,7 +8,7 @@
 #include <cstdio>//snprintf
 
 ConfigReader::ConfigReader(const std::string fileName)
-    :state_(kencoding),
+    : state_(kencoding),
     FileName_(fileName),
     hasChanged_(false)
 {

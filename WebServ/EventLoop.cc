@@ -1,16 +1,19 @@
 #include "EventLoop.h"
 #include "Channel.h"
+#include "Logging/base/CurrentThread.h"
 #include "Logging/base/Logging.h"
 
-namespace{
-    #include <unistd.h>
-    #include <sys/syscall.h>
-    #include <sys/eventfd.h>
-    #include <signal.h>
-    int getThreadId()
-    {
-        return syscall(SYS_gettid);
-    }
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/eventfd.h>
+#include <signal.h>
+
+namespace
+{
+    //int getThreadId()
+    //{
+    //    return syscall(SYS_gettid);
+    //}
 
     int createFd()
     {
@@ -20,26 +23,25 @@ namespace{
                 LOG_ERROR << "Epoll createFd failed ";
                 abort();
         }
-        LOG_LOG << "create eventfd fd = " << fd;
+        LOG_TRACE << "create eventfd fd = " << fd;
         return fd;
-
     }
+
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 class IgnoreSigPipe
 {
- public:
-  IgnoreSigPipe()
-  {
+    public:
+        IgnoreSigPipe()
+    {
     ::signal(SIGPIPE, SIG_IGN);
-    //LOG_LOG << "ignoreSigPipe";
-  }
+    }
 };
-#pragma GCC diagnostic error "-Wold-style-cast"
 
-IgnoreSigPipe initObj;
+#pragma GCC diagnostic error "-Wold-style-cast"
+    IgnoreSigPipe initObj;
 }
 
-__thread int threadid_;
+//__thread int threadid_;
 
 EventLoop::EventLoop()
     :EpollPtr_(new Epoller()),
@@ -47,11 +49,12 @@ EventLoop::EventLoop()
     wakeUpFd_(createFd()),
     wakeupChannel_(new Channel(this, wakeUpFd_)),
     mutex_(),
-    timerQueuePtr_(new TimerQueue(this))
+    timerQueuePtr_(new TimerQueue(this)),
+    threadId_(CurrentThread::tid())
 {
-    threadid_ = getThreadId();
+    //threadid_ = getThreadId();
     wakeupChannel_->enableRead();
-    LOG_LOG << "EventLoop::EventLoop created int thread " << threadid_;
+    LOG_TRACE << "EventLoop::EventLoop created int thread " << threadId_;
 }
 
 EventLoop::~EventLoop()
@@ -65,7 +68,7 @@ EventLoop::~EventLoop()
 
 void EventLoop::loop()
 {
-    LOG_LOG << "EventLoop::loop in thread " << threadid_;
+    LOG_LOG << "EventLoop::loop in thread " << threadId_;
     looping_ = true;
     while(looping_)
     {
@@ -98,6 +101,7 @@ void EventLoop::runInLoop(Functor func)
     
 }
 
+//多个线程可能同时调用此函数
 void EventLoop::queueInLoop(Functor func)
 {
     {
@@ -115,17 +119,18 @@ void EventLoop::doPendingFunc()
         MutexLockGurard lock(mutex_);
         list.swap(FuncList_);
     }
-    if(list.size() > 0)
-        LOG_LOG << "EventLoop::doPendingFunc list size is " << list.size();
-    for(const auto& i : list)
-    {
-        i();
+    if(list.size() > 0){
+        LOG_DEBUG << "EventLoop::doPendingFunc list size is " << list.size();
+        for(const auto& i : list)
+        {
+            i();
+        }
     }
 }
 
 bool EventLoop::assertInLoop()
 {
-    return threadid_ == getThreadId();
+    return threadId_ == CurrentThread::t_cachedTid;
 }
 
 void EventLoop::assertInLoopThread()
@@ -175,4 +180,3 @@ void EventLoop::runEveryN(int sec, TimerCallback cb)
 {
     timerQueuePtr_->addTimer(sec, std::move(cb), true);
 }
-

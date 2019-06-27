@@ -10,9 +10,10 @@
 struct epoll_event;
 class Channel;
 
-class Epoller : noncopyable{
-const int initSize = 64;
-const int EPOLLWAIT_TIME = 500;
+class Epoller : noncopyable
+{
+    const int initSize = 64;
+    const int EPOLLWAIT_TIME = 500;
 public: 
     Epoller();
     ~Epoller();
